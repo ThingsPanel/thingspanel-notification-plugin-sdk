@@ -1,0 +1,12 @@
+{
+  "api_version": "1.0",
+  "plugin_id": "example.local.no-send",
+  "name": "No-send example",
+  "plugin_version": "0.1.0",
+  "channels": ["email"],
+  "content_modes": ["text"],
+  "config_schema": {"type": "object", "properties": {"label": {"type": "string"}}, "additionalProperties": false},
+  "recipient_schema": {"type": "object", "properties": {"address": {"type": "string", "format": "email"}}, "required": ["address"], "additionalProperties": false},
+  "secret_fields": [],
+  "capabilities": {"delivery_receipts": false}
+}

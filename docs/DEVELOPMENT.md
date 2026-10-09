@@ -24,3 +24,19 @@ The template is intentionally a standalone module with no `require` or `replace`
 ## Repository build gates
 
 Run tests, vet, and build with `GOPROXY=off GOSUMDB=off` where dependencies permit. Check `go.mod` and `go.sum` for unexpected modules, run the secret scan, review every tracked file, and verify there are no Core/Encore imports, credentials, private reports, or runtime configuration. Never run real provider sends as part of ordinary CI.
+
+## Package a provider executable
+
+From the provider repository, test and build a Linux release binary without downloading modules:
+
+```sh
+GOPROXY=off GOSUMDB=off go test ./...
+GOPROXY=off GOSUMDB=off go vet ./...
+mkdir -p dist
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GOPROXY=off GOSUMDB=off \
+  go build -trimpath -o dist/notification-plugin ./cmd/plugin
+go version -m dist/notification-plugin
+shasum -a 256 dist/notification-plugin > dist/SHA256SUMS
+```
+
+Repeat the build with the target `GOOS` and `GOARCH` for each supported deployment platform. Keep `dist/`, provider credentials, and instance configuration out of Git. Review the executable, checksum, module path, manifest capabilities, and release notes before tagging or publishing a version. Do not report `accepted` as delivery, enable receipt capability without a verified provider-to-Core ACK path, or use real-send smoke tests as routine packaging checks.
